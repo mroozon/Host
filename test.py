@@ -1,5 +1,5 @@
 # Importing libraries
-import re, os, shutil
+import re, os, shutil, subprocess
 
 #Defining dirs and filters : needs to be personalized!
 incoming_dir = '/mnt/MEDIA_CENTER/testdir'
@@ -20,42 +20,43 @@ def walklevel(some_dir, level=1):
             del dirs[:]
 
 # Traversing directories. Creates list of names for each root, dirs, files.  
-for root, dirs, files in walklevel(incoming_dir, level=3):
+for root, dirs, files in walklevel(incoming_dir, level=2):
     #For files in incoming_dir and subfolders consider "if" statments
     for name in files:
         the_file = os.path.join(root, name)
+        #Check for filters_for_dir
         if re.search(filter_for_dir, the_file) is not None: continue
-        elif name.endswith(('.mov', '.MOV', '.avi', '.AVI', '.mpg', '.MPG', '.mkv', '.MKV','.mp4', '.MP4')) and re.search('^.+S[0-9]+E[0-9]+.*', name):
+        elif name.lower().endswith(('.mov', '.avi', '.mpg', '.mkv', '.mp4')) and re.search('^.+[sS][0-9]+[eE][0-9]+.*', name):
+            #subprocess.call(['napi.sh', ' -f subrip'], shell=True)
             try:
                 shutil.move(name, tvshows)
                 print name, ' moved to seriale'
             except:
-                print 'Nothing to move 111'
-        elif name.endswith(('.mov', '.MOV', '.avi', '.AVI', '.mpg', '.MPG', '.mkv', '.MKV','.mp4', '.MP4')):
+                print 'Nothing to move!'
+        elif name.lower().endswith(('.mov', '.avi', '.mpg', '.mkv', '.mp4',)):
             the_file = os.path.join(root, name)
             the_dir = re.findall('(^[./].+)/', the_file)[0]
-            #print os.getcwd()
-            if the_dir == os.getcwd(): continue
+            if the_dir == movies: continue
             try:
                 shutil.move(the_dir, movies)
-                print the_file, ' moved to filmy 888'
+                print the_file, ' moved to FILMY!'
             except:
-                print 'Nothing to move 222'
+                print 'Nothing to move'
     #For dirs in incoming_dir and subfolders consider "if" statments
     for name in dirs:
         if name == filters : continue
-        if re.search('^.+S[0-9]+E[0-9]+.*', name) or re.search('^.+Season.*', name):
+        if re.search('^.+[sS][0-9]+[eE][0-9]+.*', name) or re.search('.+[sS]eason.*|.+SEASON.*', name):
             try:
                 shutil.move(name, tvshows)
                 print name, ' moved to TV Shows!'
             except:
-                print 'Nothing to move 333'
+                print 'Nothing to move'
 #Moving movies files from incoming_dir to movies
 files_in_root = os.listdir(incoming_dir)
 for name in files_in_root:
-    if name.endswith(('.mov', '.MOV', '.avi', '.AVI', '.mpg', '.MPG', '.mkv', '.MKV','.mp4', '.MP4')):
+    if name.lower().endswith(('.mov', '.avi', '.mpg', '.mkv', '.mp4')):
         try:
             shutil.move(name, movies)
-            print name, ' moved to filmy 444'
+            print name, ' moved to FILMY'
         except:
-            print 'Nothing to move 444'
+            print 'Nothing to move'
