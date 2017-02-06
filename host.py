@@ -44,8 +44,10 @@ for root, dirs, files in walklevel(incoming_dir, level=2):
     #For files in incoming_dir and subfolders consider "if" statments
 
     for name in files:
-        ftype = magic.from_file(os.path.join(root, name), mime=True)
-        #print 'File Name: ', name, ' \nFile Type: ', ftype, '\n'
+        try:
+            ftype = magic.from_file(os.path.join(root, name), mime=True)
+        except:
+            continue
         if re.search('^.*video.*', ftype) is not None and re.search('^.+[s][0-9]+[e][0-9]+.*', name.lower()):
             print name, ' Found a TV show file...'
             try:
@@ -56,9 +58,7 @@ for root, dirs, files in walklevel(incoming_dir, level=2):
         elif re.search('^.*video.*', ftype) is not None:
             print name, ' Found a movie file...'
             the_file = os.path.join(root, name)
-            print the_file
             the_dir = re.findall('(^[./].+)/', the_file)[0]
-            print the_dir
             try:
                 shutil.move(the_dir, movies)
                 print name, ' ...moved to MOVIES folder'
